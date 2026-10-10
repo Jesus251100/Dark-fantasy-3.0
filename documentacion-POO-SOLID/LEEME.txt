@@ -1,0 +1,17 @@
+Carpeta de sustentación — Bingo Dark Fantasy 3.0
+================================================
+
+Archivos:
+- Guia-POO-SOLID-Dark-Fantasy.docx  → Word (se puede editar y poner tu nombre)
+- Guia-POO-SOLID-Dark-Fantasy.pdf   → PDF para proyectar o enviar al instructor
+
+Qué contiene:
+1. Frase lista para la sustentación
+2. Capas del código (Vue / dominio / infraestructura)
+3. POO: encapsulación, abstracción, herencia, polimorfismo — con la ruta de cada archivo
+4. SOLID letra por letra — con la ruta de cada archivo
+5. Lista de “abre este archivo en clase”
+6. Tabla resumen para imprimir
+
+El código del juego NO está en esta carpeta. Sigue en:
+C:\Users\sanch\Downloads\Dark-fantasy-3.0\src\domain

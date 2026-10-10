@@ -1,0 +1,337 @@
+@startuml DarkFantasy_DiagramaDeClases
+title Bingo Dark Fantasy 3.0 — Diagrama de clases (POO + SOLID)
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam class {
+  BackgroundColor #F4EFE6
+  BorderColor #5C2E1F
+  ArrowColor #5C2E1F
+  FontName Arial
+}
+skinparam package {
+  BackgroundColor #FBF7F0
+  BorderColor #8A6A32
+  FontColor #5C2E1F
+}
+hide empty members
+
+package "domain.bingo" as PBingo {
+  class Celda {
+    - marcada : boolean
+    + numero : number
+    + libre : boolean
+    + estaMarcada() : boolean
+    + marcar() : void
+    + desmarcar() : void
+    + toggle() : void
+    + cubreBola(cantadas) : boolean
+  }
+
+  class Carton {
+    - celdas : Celda[]
+    + tamano : number
+    + marcarNumero(n) : boolean
+    + toggleCelda(i, cantadas) : boolean
+    + evaluarVictoria(patrones, cantadas) : WinResult
+    + progresoMejorPatron(patrones) : number
+  }
+
+  class Bolsa {
+    - restantes : number[]
+    + sacar() : number
+    + quedan() : boolean
+  }
+
+  class Oraculo {
+    - cantadas : number[]
+    - bolsa : Bolsa
+    + cantar() : number
+    + yaCanto(n) : boolean
+  }
+
+  interface IPatronVictoria <<interface>> {
+    + id : WinMode
+    + nombre() : string
+    + indices(tamano) : number[][]
+    + indicesGanadores(carton, cantadas) : number[]
+    + marcadoSinCantar(carton, cantadas) : boolean
+  }
+
+  abstract class PatronBase {
+    + indicesGanadores()
+    + marcadoSinCantar()
+  }
+
+  class PatronFila
+  class PatronColumna
+  class PatronDiagonal
+  class PatronL
+  class PatronO
+  class PatronCruz
+  class PatronT
+  class PatronFlecha
+  class PatronH
+  class PatronZigzag
+  class PatronCartonCompleto
+  class PatronCorona
+}
+
+package "domain.bots" as PBots {
+  abstract class Bot {
+    + carton : Carton
+    + statusText : string
+    + progress : number
+    + won : boolean
+    + {abstract} nombre : string
+    + {abstract} multVelocidad : number
+    + {abstract} multFallo : number
+    + decidir(bola, dificultad, patrones) : DecisionBot
+    + aplicarMarca(indice, patrones) : void
+  }
+
+  class ArzobispoPereza
+  class SantoEspada
+  class BrujaEnvidia
+  class Dragon
+  class DificultadNivel {
+    + baseReactionMs : number
+    + missChance : number
+    + smartTargeting : boolean
+    + delayMs(mult) : number
+    + debeMarcar(mult, ayuda) : boolean
+    + {static} paraNivel(n) : DificultadNivel
+  }
+  class FabricaBots {
+    + {static} roster(tamano, max) : Bot[]
+  }
+}
+
+package "domain.partida" as PPartida {
+  class Partida {
+    - cartones : Carton[]
+    - oraculo : Oraculo
+    - bots : Bot[]
+    - patrones : IPatronVictoria[]
+    - estado : EstadoPartida
+    - dificultad : DificultadNivel
+    + iniciar() : void
+    + pausar() : void
+    + marcarCelda() : void
+    + cantarSiguiente() : number
+    + reclamarBingo(i) : WinResult
+  }
+}
+
+package "domain.campania" as PCampania {
+  class Jugador {
+    + nombre : string
+    + monedas : number
+    + diamantes : number
+    + boosters : StockBoosters
+    + gastarMonedas(n) : boolean
+    + gastarDiamantes(n) : boolean
+    + agregarBooster(id, qty) : void
+    + setNombre(name) : void
+  }
+
+  class Recompensa {
+    + monedas : number
+    + diamantes : number
+    + {static} deNivel(n) : Recompensa
+    + {static} deRepeticion(n) : Recompensa
+    + aplicar(jugador) : void
+  }
+
+  class Campania {
+    + jugador : Jugador
+    + highestUnlocked : number
+    + completed : number[]
+    + wins : number
+    + estaDesbloqueado(n) : boolean
+    + completarNivel(n) : ResultadoClear
+  }
+
+  class CatalogoNiveles {
+    + {static} obtener(n) : DefinicionNivel
+    + {static} configPartida(n) : ConfigPartida
+  }
+
+  interface IRepositorioCampania <<interface>> {
+    + cargar() : DatosCampania
+    + guardar(datos) : void
+  }
+}
+
+package "domain.boosters" as PBoost {
+  abstract class Booster {
+    + {abstract} id : number
+    + {abstract} nombre : string
+    + {abstract} precio : number
+    + {abstract} moneda : string
+  }
+  class BoosterFreeze
+  class BoosterSabotage
+  class BoosterGoodLuck
+  class BoosterShield
+  class CatalogoBoosters {
+    + {static} listar() : Booster[]
+    + {static} porId(id) : Booster
+  }
+}
+
+package "domain.identidad" as PId {
+  class Usuario {
+    + correo : string
+    + rol : RolUsuario
+    + puedeJugar() : boolean
+    + puedeVerPanel() : boolean
+  }
+  class Administrador {
+    + puedeVerPanel() : boolean
+  }
+  class Sesion {
+    + iniciarJugador(correo) : Usuario
+    + iniciarAdmin(correo) : Administrador
+    + actual() : Usuario
+  }
+  interface IRepositorioSesion <<interface>> {
+    + guardar(usuario) : void
+    + cargar() : datos
+    + borrar() : void
+  }
+}
+
+package "application" as PApp {
+  class ComprarBooster {
+    - campania : Campania
+    + ejecutar(id, cantidad) : Resultado
+  }
+  class IntercambiarMoneda {
+    - campania : Campania
+    + diamantesAMonedas() : Resultado
+    + monedasADiamantes() : Resultado
+  }
+  class IniciarSesion {
+    + comoJugador(correo) : Usuario
+    + comoAdmin(correo) : Administrador
+  }
+}
+
+package "infrastructure" as PInfra {
+  class LocalStorageCampaniaRepo
+  class MemoriaCampaniaRepo
+  class SessionAuthRepo
+  class SessionStoragePartidaRepo
+  class PrismaClient
+}
+
+package "persistencia PostgreSQL" as PBD {
+  class UsuarioBD <<table>> {
+    id
+    correo
+    claveHash
+    rol
+    nombre
+  }
+  class ProgresoBD <<table>> {
+    usuarioId
+    highestUnlocked
+    completed
+    coins
+    diamonds
+    wins
+    boosters
+  }
+  class PartidaBD <<table>> {
+    usuarioId
+    nivel
+    gano
+    creadoEn
+  }
+}
+
+' --- Relaciones bingo ---
+Carton "1" *-- "n" Celda : contiene
+Oraculo "1" *-- "1" Bolsa
+PatronBase ..|> IPatronVictoria
+PatronFila --|> PatronBase
+PatronColumna --|> PatronBase
+PatronDiagonal --|> PatronBase
+PatronL --|> PatronBase
+PatronO --|> PatronBase
+PatronCruz --|> PatronBase
+PatronT --|> PatronBase
+PatronFlecha --|> PatronBase
+PatronH --|> PatronBase
+PatronZigzag --|> PatronBase
+PatronCartonCompleto --|> PatronBase
+PatronCorona --|> PatronBase
+
+' --- Bots ---
+ArzobispoPereza --|> Bot
+SantoEspada --|> Bot
+BrujaEnvidia --|> Bot
+Dragon --|> Bot
+Bot "1" *-- "1" Carton
+FabricaBots ..> Bot : crea
+Bot ..> DificultadNivel : usa
+Bot ..> IPatronVictoria : usa
+
+' --- Partida ---
+Partida "1" *-- "1..*" Carton
+Partida "1" *-- "1" Oraculo
+Partida "1" o-- "4" Bot
+Partida "1" o-- "1..*" IPatronVictoria
+Partida ..> DificultadNivel
+Partida ..> FabricaBots
+Partida ..> CatalogoNiveles : se configura con
+
+' --- Campaña ---
+Campania "1" *-- "1" Jugador
+Campania ..> Recompensa : aplica
+Campania ..> IRepositorioCampania : D
+Jugador ..> Recompensa : recibe
+Jugador o-- Booster : inventario
+CatalogoBoosters ..> Booster : lista
+BoosterFreeze --|> Booster
+BoosterSabotage --|> Booster
+BoosterGoodLuck --|> Booster
+BoosterShield --|> Booster
+
+' --- Identidad ---
+Administrador --|> Usuario
+Sesion ..> IRepositorioSesion : D
+Sesion ..> Usuario : crea
+
+' --- Casos de uso ---
+ComprarBooster ..> Campania
+ComprarBooster ..> CatalogoBoosters
+IntercambiarMoneda ..> Campania
+IniciarSesion ..> Sesion
+
+' --- Infra ---
+LocalStorageCampaniaRepo ..|> IRepositorioCampania
+MemoriaCampaniaRepo ..|> IRepositorioCampania
+SessionAuthRepo ..|> IRepositorioSesion
+SessionStoragePartidaRepo ..> Partida : snapshot
+PrismaClient ..> UsuarioBD
+PrismaClient ..> ProgresoBD
+PrismaClient ..> PartidaBD
+
+UsuarioBD "1" -- "1" ProgresoBD
+UsuarioBD "1" -- "n" PartidaBD
+Campania ..> PrismaClient : backend persiste
+
+note right of IPatronVictoria
+  SOLID O: patrón nuevo = clase nueva
+  sin editar Partida
+end note
+
+note bottom of IRepositorioCampania
+  SOLID D: Campania no conoce
+  localStorage ni PostgreSQL
+end note
+
+@enduml

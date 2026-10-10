@@ -1,0 +1,86 @@
+name: darkfantasy
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: darkfantasy-pg
+    environment:
+      POSTGRES_USER: darkfantasy
+      POSTGRES_PASSWORD: darkfantasy
+      POSTGRES_DB: darkfantasy
+    ports:
+      - "5433:5432"
+    volumes:
+      - darkfantasy_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U darkfantasy -d darkfantasy"]
+      interval: 3s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+    networks: [darkfantasy]
+
+  mail:
+    image: axllent/mailpit
+    container_name: darkfantasy-mail
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    restart: unless-stopped
+    networks: [darkfantasy]
+
+  backend:
+    build: ./backend
+    container_name: darkfantasy-api
+    init: true
+    stop_grace_period: 15s
+    environment:
+      DATABASE_URL: postgresql://darkfantasy:darkfantasy@db:5432/darkfantasy
+      JWT_SECRET: ${JWT_SECRET:-darkfantasy-sena-adso-dev}
+      PORT: "3001"
+      SMTP_HOST: ${SMTP_HOST:-mail}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_FROM: ${SMTP_FROM:-Dark Fantasy <no-reply@darkfantasy.local>}
+    ports:
+      - "3001:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+      mail:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3001/api/salud').then((r)=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+    restart: unless-stopped
+    networks: [darkfantasy]
+
+  frontend:
+    build: .
+    container_name: darkfantasy-web
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_started
+    restart: unless-stopped
+    networks: [darkfantasy]
+
+volumes:
+  darkfantasy_pg:
+    name: dark-fantasy-30_darkfantasy_pg
+
+networks:
+  darkfantasy:
+    name: darkfantasy-net

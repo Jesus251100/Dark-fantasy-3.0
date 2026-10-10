@@ -1,0 +1,58 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+.DS_Store
+dist
+dist-ssr
+coverage
+*.local
+.env
+backend/.env
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+*.tsbuildinfo
+
+.eslintcache
+
+# Cypress
+/cypress/videos/
+/cypress/screenshots/
+
+# Vitest
+__screenshots__/
+
+# Vite
+*.timestamp-*-*.mjs
+
+documentacion-POO-SOLID/_slides/
+documentacion-POO-SOLID/_code/
+documentacion-POO-SOLID/_unpacked/
+
+# Presentaciones, Word y scripts de generar diapositivas
+~$*
+*.pptx
+*.docx
+_pptx_*/
+_pptx_*.cjs
+_doc_plan.cjs
+documentacion-POO-SOLID/*.html
+documentacion-POO-SOLID/*.cjs
+documentacion-POO-SOLID/*.py
+documentacion-POO-SOLID/package.json
+documentacion-POO-SOLID/package-lock.json

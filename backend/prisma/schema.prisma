@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id             String                 @id @default(uuid())
+  correo         String                 @unique
+  claveHash      String
+  rol            String
+  nombre         String
+  creadoEn       DateTime               @default(now())
+  progreso       Progreso?
+  partidas       Partida[]
+  transacciones  HistorialTransaccion[]
+}
+
+model Progreso {
+  id               String   @id @default(uuid())
+  usuarioId        String   @unique
+  usuario          Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  highestUnlocked  Int      @default(1)
+  completed        Int[]    @default([])
+  coins            Int      @default(0)
+  diamonds         Int      @default(0)
+  wins             Int      @default(0)
+  boosters         Json     @default("{\"1\":0,\"2\":0,\"3\":0,\"4\":0}")
+  actualizadoEn    DateTime @updatedAt
+}
+
+model Partida {
+  id        String   @id @default(uuid())
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  nivel     Int
+  gano      Boolean
+  creadoEn  DateTime @default(now())
+}
+
+/// Libro de compras, intercambios y recompensas. El saldo vive en Progreso.
+model HistorialTransaccion {
+  id               String   @id @default(uuid())
+  usuarioId        String
+  usuario          Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tipo             String
+  deltaMonedas     Int
+  deltaDiamantes   Int
+  monedasDespues   Int
+  diamantesDespues Int
+  detalle          String
+  creadoEn         DateTime @default(now())
+
+  @@index([usuarioId, creadoEn])
+}
+
+model CodigoVerificacion {
+  id         String   @id @default(uuid())
+  correo     String
+  codigoHash String
+  expiraEn   DateTime
+  usado      Boolean  @default(false)
+  creadoEn   DateTime @default(now())
+
+  @@index([correo, usado])
+}
