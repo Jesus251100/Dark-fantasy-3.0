@@ -63,6 +63,11 @@ const router = createRouter({
       component: LobbyView,
     },
     {
+      path: '/pvp',
+      name: 'pvp',
+      component: PvpView,
+    },
+    {
       path: '/inventory',
       name: 'inventory',
       component: InventoryView,
