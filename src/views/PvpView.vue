@@ -63,7 +63,7 @@ async function unirse() {
     mensaje.value = e instanceof Error ? e.message : 'No se pudo entrar.'
   } finally { cargando.value = false }
 }
-async function salir() {
+async function copiarCodigo() {\n  if (!sala.value) return\n  try { await navigator.clipboard.writeText(sala.value.codigo); mensaje.value = 'Código copiado.' } catch { mensaje.value = 'No se pudo copiar; comparte el código manualmente.' }\n}\nasync function salir() {
   detenerPoll()
   if (sala.value) {
     try { await api(`/api/pvp/${sala.value.id}/salir`, { method: 'POST' }) } catch { /* la sala puede haber expirado */ }
@@ -109,7 +109,7 @@ onUnmounted(detenerPoll)
       <template v-else>
         <div class="room-code">
           <small>CÓDIGO DE SALA</small><strong>{{ sala.codigo }}</strong>
-          <button @click="navigator.clipboard?.writeText(sala.codigo)">COPIAR CÓDIGO</button>
+          <button @click="copiarCodigo">COPIAR CÓDIGO</button>
         </div>
         <p class="status">{{ sala.estado === 'lista' ? 'Sala completa' : 'Esperando al segundo jugador…' }}</p>
         <ul class="players"><li v-for="(jugador, i) in sala.jugadores" :key="jugador.id">⚔ {{ jugador.nombre }} <span>{{ i === 0 ? 'Anfitrión' : 'Contrincante' }}</span></li></ul>
