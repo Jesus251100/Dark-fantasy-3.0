@@ -67,3 +67,20 @@ model CodigoVerificacion {
 
   @@index([correo, usado])
 }
+
+
+/// Sala PvP persistente. El estado de juego vive en JSON y solo el backend lo modifica.
+model PvpSala {
+  id             String   @id @default(uuid())
+  codigo         String   @unique
+  modo           String
+  nivel          Int
+  estado         String   @default("esperando")
+  datos          Json
+  expiraEn       DateTime
+  creadoEn       DateTime @default(now())
+  actualizadoEn  DateTime @updatedAt
+
+  @@index([estado, modo, nivel, creadoEn])
+  @@index([expiraEn])
+}
