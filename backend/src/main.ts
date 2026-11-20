@@ -7,6 +7,7 @@ import { resumenConexion } from './infrastructure/conexionBd'
 import rutasAuth from './http/rutasAuth'
 import rutasCampania from './http/rutasCampania'
 import rutasAdmin from './http/rutasAdmin'
+import rutasPvp from './http/rutasPvp'
 
 const app = express()
 const port = Number(process.env.PORT ?? 3001)
@@ -63,6 +64,7 @@ app.get('/api/salud', async (_req, res) => {
 app.use('/api/auth', rutasAuth)
 app.use('/api/campania', rutasCampania)
 app.use('/api/admin', rutasAdmin)
+app.use('/api/pvp', rutasPvp)
 
 app.listen(port, '0.0.0.0', () => {
   console.log(`API Dark Fantasy en http://0.0.0.0:${port}`)
