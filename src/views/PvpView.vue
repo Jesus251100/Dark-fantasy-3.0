@@ -63,7 +63,16 @@ async function unirse() {
     mensaje.value = e instanceof Error ? e.message : 'No se pudo entrar.'
   } finally { cargando.value = false }
 }
-async function copiarCodigo() {\n  if (!sala.value) return\n  try { await navigator.clipboard.writeText(sala.value.codigo); mensaje.value = 'Código copiado.' } catch { mensaje.value = 'No se pudo copiar; comparte el código manualmente.' }\n}\nasync function salir() {
+async function copiarCodigo() {
+  if (!sala.value) return
+  try {
+    await navigator.clipboard.writeText(sala.value.codigo)
+    mensaje.value = 'Código copiado.'
+  } catch {
+    mensaje.value = 'No se pudo copiar; comparte el código manualmente.'
+  }
+}
+async function salir() {
   detenerPoll()
   if (sala.value) {
     try { await api(`/api/pvp/${sala.value.id}/salir`, { method: 'POST' }) } catch { /* la sala puede haber expirado */ }
