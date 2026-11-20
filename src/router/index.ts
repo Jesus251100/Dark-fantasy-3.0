@@ -27,6 +27,7 @@ import Level7View from '../views/Level7View.vue'
 import Level8View from '../views/Level8View.vue'
 import Level9View from '../views/Level9View.vue'
 import Level10View from '../views/Level10View.vue'
+import PvpView from '../views/PvpView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -160,7 +161,7 @@ const router = createRouter({
 })
 
 const rutasPrivadas = new Set([
-  '/lobby',
+  '/lobby',\n  '/pvp',
   '/inventory',
   '/store',
   '/levels',
